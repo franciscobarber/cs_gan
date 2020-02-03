@@ -86,7 +86,7 @@ class MLPGeneratorNet(snt.AbstractModule):
 
   def _build(self, inputs, is_training=True):
     del is_training
-    net = snt.nets.MLP([500, 500, 784], activation=tf.nn.leaky_relu)
+    net = snt.nets.MLP([500, 500, 4096], activation=tf.nn.leaky_relu)
     out = net(inputs)
     out = tf.nn.tanh(out)
     return snt.BatchReshape([28, 28, 1])(out)
