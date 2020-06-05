@@ -19,7 +19,7 @@ import numpy as np
 import sonnet as snt
 import tensorflow.compat.v1 as tf
 import tensorflow_gan as tfgan
-
+global spec
 
 def _sn_custom_getter():
   def name_filter(name):
