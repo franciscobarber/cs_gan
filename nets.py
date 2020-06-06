@@ -86,12 +86,10 @@ class MLPGeneratorNet(snt.AbstractModule):
 
   def _build(self, inputs, is_training=True):
     del is_training
-    #net = snt.nets.MLP([1000, 1000, 4096], activation=tf.nn.leaky_relu)
-    net = snt.nets.MLP(spec.gen_net_shape, activation=tf.nn.leaky_relu)
+    net = snt.nets.MLP([1000, 1000, 4096], activation=tf.nn.leaky_relu)
     out = net(inputs)
     out = tf.nn.tanh(out)
-    #return snt.BatchReshape([256, 16, 1])(out)
-    return snt.BatchReshape(spec.gen_ouput_shape)(out)
+    return snt.BatchReshape([256, 16, 1])(out)
 
 class MLPMetricNet(snt.AbstractModule):
   """Same as in Grover and Ermon, ICLR workshop 2017."""
