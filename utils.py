@@ -77,7 +77,7 @@ def cross_entropy_loss(logits, expected):
           logits=logits, labels=expected))
 
 
-def optimise_and_sample(init_z, module, data, is_training, std):
+def optimise_and_sample(init_z, module, data, std, is_training):
   """Optimising generator latent variables and sample."""
   eps = tf.random_normal(tf.shape(mean), 0, 1, dtype=tf.float32)
   ruido = tf.multiply(std, eps) 
