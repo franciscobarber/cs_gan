@@ -31,9 +31,7 @@ class ModelOutputs(
     collections.namedtuple('AdversarialModelOutputs',
                            ['optimization_components', 'debug_ops'])):
   """All the information produced by the adversarial module.
-
   Fields:
-
     * `optimization_components`: A dictionary. Each entry in this dictionary
       corresponds to a module to train using their own optimizer. The keys are
       names of the components, and the values are `common.OptimizationComponent`
@@ -48,13 +46,10 @@ class ModelOutputs(
 class OptimizationComponent(
     collections.namedtuple('OptimizationComponent', ['loss', 'vars'])):
   """Information needed by the optimizer to train modules.
-
   Usage:
       `optimizer.minimize(
           opt_compoment.loss, var_list=opt_component.vars)`
-
   Fields:
-
     * `loss`: A `tf.Tensor` the loss of the module.
     * `vars`: A list of variables, the ones which will be used to minimize the
       loss.
@@ -63,16 +58,12 @@ class OptimizationComponent(
 
 def cross_entropy_loss(logits, expected):
   """The cross entropy classification loss between logits and expected values.
-
   The loss proposed by the original GAN paper: https://arxiv.org/abs/1406.2661.
-
   Args:
     logits: a `tf.Tensor`, the model produced logits.
     expected: a `tf.Tensor`, the expected output.
-
   Returns:
     A scalar `tf.Tensor`, the average loss obtained on the given inputs.
-
   Raises:
     ValueError: if the logits do not have shape [batch_size, 2].
   """
@@ -86,9 +77,10 @@ def cross_entropy_loss(logits, expected):
           logits=logits, labels=expected))
 
 
-def optimise_and_sample(init_z, module, data, is_training):
+def optimise_and_sample(init_z, module, data, is_training, std):
   """Optimising generator latent variables and sample."""
-
+  eps = tf.random_normal(tf.shape(mean), 0, 1, dtype=tf.float32)
+  ruido = tf.multiply(std, eps) 
   if module.num_z_iters == 0:
     z_final = init_z
   else:
@@ -96,7 +88,7 @@ def optimise_and_sample(init_z, module, data, is_training):
     loop_cond = lambda i, _: i < module.num_z_iters
     def loop_body(i, z):
       loop_samples = module.generator(z, is_training)
-      gen_loss = module.gen_loss_fn(data, loop_samples)
+      gen_loss = module.gen_loss_fn(data, loop_samples, ruido)
       z_grad = tf.gradients(gen_loss, z)[0]
       z -= module.z_step_size * z_grad
       z = _project_z(z, module.z_project_method)
@@ -231,4 +223,3 @@ def make_prior(num_latents):
   prior_scale = tf.ones(shape=(num_latents), dtype=tf.float32)
 
   return tfd.Normal(loc=prior_mean, scale=prior_scale)
-
