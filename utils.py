@@ -81,7 +81,7 @@ def optimise_and_sample(init_z, module, data, std, is_training):
   """Optimising generator latent variables and sample."""
   eps = tf.random_normal(tf.shape(module._measure(data)), 0, 1, dtype=tf.float32)
   if (is_training):
-    ruido = tf.multiply(0.0, eps)
+    ruido = tf.multiply(0.1, eps)
   else:  
     ruido = tf.multiply(std, eps) 
   if module.num_z_iters == 0:
